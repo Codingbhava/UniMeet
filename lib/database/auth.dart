@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:unimeet/database/read.dart';
+import 'package:unimeet/database/update.dart';
 
 final FirebaseFirestore _db = FirebaseFirestore.instance;
 final CollectionReference _users = _db.collection('users');
@@ -27,10 +28,13 @@ Future<void> GoogleData(User user) async {
     'photoURL': user.photoURL,
     "isPhoto": true
   };
+  final updateData = {'photoURL': user.photoURL, "isPhoto": true};
   DocumentSnapshot<Object?> userData = await CurrentUserData(user.uid);
   if (!userData.exists) {
     await _users.doc(user.uid).set(data).onError((e, _) {
       print("Google Data store error 'users' : $e");
     });
+  } else {
+    UpdateUser(updateData, user.uid);
   }
 }

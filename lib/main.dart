@@ -3,6 +3,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:unimeet/context/auth.dart';
+import 'package:unimeet/pages/join.dart';
+import 'package:unimeet/pages/scheduled.dart';
+import 'package:unimeet/pages/settings.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -30,6 +33,9 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       routes: {
         "/usercheck": (context) => UserCheck(),
+        "/join": (context) => JoinMeet(),
+        "/scheduled": (context) => Scheduled(),
+        "/settings": (context) => SettingsPage(),
       },
       home: UserCheck(),
     );
