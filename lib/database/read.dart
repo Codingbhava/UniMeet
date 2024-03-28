@@ -30,11 +30,8 @@ Stream<DocumentSnapshot<Map<String, dynamic>>> currentUser(String userId) {
   }
 }
 
-Stream<List<Map<String, dynamic>>> Users() {
-  return _users.snapshots().map((snapshot) {
-    return snapshot.docs.map<Map<String, dynamic>>((doc) {
-      final user = doc.data();
-      return user as Map<String, dynamic>;
-    }).toList();
-  });
-}
+Stream<QuerySnapshot<Map<String, dynamic>>> get meetingsHistory => _db
+    .collection('users')
+    .doc(LogUser?.uid)
+    .collection('meetings')
+    .snapshots();

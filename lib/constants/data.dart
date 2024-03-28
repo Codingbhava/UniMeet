@@ -12,7 +12,7 @@ const neonPurple = Colors.purple;
 const grey = Color.fromARGB(255, 37, 37, 37);
 const common = Color(0xFFAABBC3);
 const glow = Color.fromARGB(255, 0, 174, 255);
-
+bool isDarkMode(context) => Theme.of(context).brightness == Brightness.dark;
 double Radius = 5.0;
 double findWidth(context) => MediaQuery.of(context).size.width;
 double findHeight(context) => MediaQuery.of(context).size.height;
