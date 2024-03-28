@@ -225,6 +225,7 @@ class _SignInState extends State<SignIn> {
               SizedBox(
                 height: 40,
               ),
+              if (showProgress) LinearProgressIndicator(),
               Row(
                 children: [
                   Text(

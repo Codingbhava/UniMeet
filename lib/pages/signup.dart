@@ -103,10 +103,15 @@ class _SignUpState extends State<SignUp> {
           showProgress = true;
         });
 
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
+        UserCredential userCredential =
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _email.text.trim(),
           password: _password.text.trim(),
         );
+        userCredential.user!.updateDisplayName(_username.text.trim());
+
+        RegisterData(
+            userCredential.user!, _username.text.trim(), _email.text.trim());
 
         setState(() {
           showProgress = false;
@@ -118,23 +123,21 @@ class _SignUpState extends State<SignUp> {
         // Check specific error codes and customize the error message accordingly
         if (e is FirebaseAuthException) {
           switch (e.code) {
-            case 'user-not-found':
-              errorMessage = "User not found. Please check your credentials.";
+            case 'weak-password':
+              errorMessage = "Password should be at least 6 characters.";
               break;
-            case 'wrong-password':
-              errorMessage = "Invalid password. Please try again.";
+            case 'email-already-in-use':
+              errorMessage = "email id already used  ";
               break;
-            case 'network-request-failed':
+            case 'internal-error':
               errorMessage = "Check Internet";
               break;
             case 'invalid-email':
-              errorMessage = "Invalid email. Please try again.";
-              break;
-            case 'invalid-credential':
-              errorMessage = "Invalid credential. Please try again.";
+              errorMessage = "Invalid password. Please try again.";
               break;
             default:
-              errorMessage = "An error occurred during registration: ${e.code}";
+              errorMessage =
+                  "An error occurred during registration: ${e.message}";
             // Add more cases for other possible error codes
           }
         }
@@ -170,6 +173,7 @@ class _SignUpState extends State<SignUp> {
               SizedBox(
                 height: 40,
               ),
+              if (showProgress) LinearProgressIndicator(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
