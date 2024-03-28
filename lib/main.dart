@@ -28,9 +28,9 @@ class _MyAppState extends State<MyApp> {
       darkTheme: FlexThemeData.dark(scheme: FlexScheme.gold),
       themeMode: ThemeMode.system,
       debugShowCheckedModeBanner: false,
-      // routes: {
-
-      // },
+      routes: {
+        "/usercheck": (context) => UserCheck(),
+      },
       home: UserCheck(),
     );
   }

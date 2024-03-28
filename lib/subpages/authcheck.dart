@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:unimeet/pages/login.dart';
+import 'package:unimeet/pages/signin.dart';
 import 'package:unimeet/pages/signup.dart';
 
 class AuthCheck extends StatefulWidget {

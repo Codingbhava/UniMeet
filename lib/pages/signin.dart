@@ -5,22 +5,31 @@ import 'package:unimeet/components/textfield.dart';
 import 'package:unimeet/constants/data.dart';
 import 'package:unimeet/database/auth.dart';
 
-class SignUp extends StatefulWidget {
-  final VoidCallback showSignIn;
-  const SignUp({super.key, required this.showSignIn});
+class SignIn extends StatefulWidget {
+  final VoidCallback showSignUp;
+  const SignIn({super.key, required this.showSignUp});
 
   @override
-  State<SignUp> createState() => _SignUpState();
+  State<SignIn> createState() => _SignInState();
 }
 
-class _SignUpState extends State<SignUp> {
-  TextEditingController _email = TextEditingController();
-  TextEditingController _password = TextEditingController();
-  TextEditingController _username = TextEditingController();
+class _SignInState extends State<SignIn> {
   var showProgress = false;
   String error = "";
   final GoogleSignIn googleSignIn = GoogleSignIn();
-  bool _isVerify(String email, String pass, String username) {
+  TextEditingController _email = TextEditingController();
+  TextEditingController _password = TextEditingController();
+  bool _isEmail(String email) {
+    if (email == "" || email.isEmpty) {
+      setState(() {
+        error = "Enter a Email";
+      });
+      return false;
+    }
+    return true;
+  }
+
+  bool _isVerify(String email, String pass) {
     if (email == "" || email.isEmpty) {
       setState(() {
         error = "Enter a Email";
@@ -33,13 +42,59 @@ class _SignUpState extends State<SignUp> {
       });
       return false;
     }
-    if (username == "" || username.isEmpty) {
-      setState(() {
-        error = "Enter a UserName";
-      });
-      return false;
-    }
     return true;
+  }
+
+  Future<void> _resetpass() async {
+    if (_isEmail(_email.text)) {
+      try {
+        setState(() {
+          showProgress = true;
+        });
+
+        await FirebaseAuth.instance
+            .sendPasswordResetEmail(email: _email.text.trim());
+        setState(() {
+          error = "send mail to ${_email.text} for reset password";
+          showProgress = false;
+        });
+      } catch (e) {
+        print(e.toString());
+        String errorMessage = "An error occurred during registration";
+
+        // Check specific error codes and customize the error message accordingly
+        if (e is FirebaseAuthException) {
+          switch (e.code) {
+            case 'user-not-found':
+              errorMessage = "User not found. Please check your credentials.";
+              break;
+            case 'wrong-password':
+              errorMessage = "Invalid password. Please try again.";
+              break;
+            case 'network-request-failed':
+              errorMessage = "Check Internet";
+              break;
+            case 'invalid-email':
+              errorMessage = "Invalid email. Please try again.";
+              break;
+            case 'invalid-credential':
+              errorMessage = "Invalid credential. Please try again.";
+              break;
+            default:
+              errorMessage = "An error occurred during registration: ${e.code}";
+            // Add more cases for other possible error codes
+          }
+        }
+
+        setState(() {
+          error = errorMessage;
+        });
+      } finally {
+        setState(() {
+          showProgress = false;
+        });
+      }
+    }
   }
 
   Future<void> _google() async {
@@ -96,8 +151,8 @@ class _SignUpState extends State<SignUp> {
     } finally {}
   }
 
-  Future _signup() async {
-    if (_isVerify(_email.text, _password.text, _username.text)) {
+  Future _signin() async {
+    if (_isVerify(_email.text, _password.text)) {
       try {
         setState(() {
           showProgress = true;
@@ -155,7 +210,6 @@ class _SignUpState extends State<SignUp> {
     // TODO: implement dispose
     _email.dispose();
     _password.dispose();
-    _username.dispose();
     super.dispose();
   }
 
@@ -166,32 +220,32 @@ class _SignUpState extends State<SignUp> {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(
                 height: 40,
               ),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                      onPressed: widget.showSignIn,
-                      icon: Icon(Icons.arrow_back_ios_new)),
                   Text(
-                    "Sign Up",
+                    "Sign In",
                     style: TextStyle(fontSize: 30, fontWeight: FontWeight.w900),
                   ),
                 ],
               ),
               SizedBox(
-                height: 40,
+                height: 20,
               ),
-              FieldForm(
-                Label: "Username",
-                isPass: false,
-                controller: _username,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("No account?"),
+                  TextButton(
+                      onPressed: widget.showSignUp, child: Text("Make account"))
+                ],
               ),
               SizedBox(
-                height: 10,
+                height: 20,
               ),
               FieldForm(
                 Label: "Email",
@@ -206,9 +260,13 @@ class _SignUpState extends State<SignUp> {
                 isPass: true,
                 controller: _password,
               ),
+              SizedBox(
+                height: 5,
+              ),
               if (error.isNotEmpty)
                 Row(
                   children: [
+                    SizedBox(width: 5),
                     Text(
                       error,
                       style: TextStyle(color: Colors.red[400]),
@@ -222,7 +280,17 @@ class _SignUpState extends State<SignUp> {
                 children: [
                   Expanded(
                       child: ElevatedButton(
-                          onPressed: _signup, child: Text("Sign Up"))),
+                          onPressed: _signin, child: Text("Sign In"))),
+                ],
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                      onPressed: _resetpass, child: Text("Forget Password?")),
                 ],
               ),
               SizedBox(
@@ -240,7 +308,7 @@ class _SignUpState extends State<SignUp> {
                   Expanded(
                       child: ElevatedButton(
                           onPressed: _google,
-                          child: Text("Sign Up with Google"))),
+                          child: Text("Sign In with Google"))),
                 ],
               )
             ],

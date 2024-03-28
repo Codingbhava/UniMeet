@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatefulWidget {
@@ -10,6 +11,19 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      floatingActionButton: ElevatedButton.icon(
+          onPressed: () {
+            FirebaseAuth.instance.signOut();
+            Navigator.pushNamed(context, '/usercheck');
+          },
+          icon: Icon(Icons.add),
+          label: Text("Sign Out")),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [],
+        ),
+      ),
+    );
   }
 }
