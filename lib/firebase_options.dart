@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
         );
     }
   }
-
+// data found on firebase console
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'add api key',
     appId: 'add appid',
