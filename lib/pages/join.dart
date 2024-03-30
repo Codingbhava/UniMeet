@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:unimeet/components/appbar.dart';
 import 'package:unimeet/components/textfield.dart';
@@ -12,13 +11,8 @@ class JoinMeet extends StatefulWidget {
 }
 
 class _JoinMeetState extends State<JoinMeet> {
-  final JitsiMeetMethods _jitsiMeetMethods = JitsiMeetMethods();
   TextEditingController _roomid = TextEditingController();
   TextEditingController _pass = TextEditingController();
-  createNewMeeting() async {
-    _jitsiMeetMethods.createMeeting(
-        roomName: _roomid.text.trim(), isCreate: false);
-  }
 
   @override
   void dispose() {
@@ -43,7 +37,7 @@ class _JoinMeetState extends State<JoinMeet> {
               SizedBox(
                 height: 10,
               ),
-              FieldForm(Label: "Password :", controller: _pass, isPass: true),
+              FieldForm(Label: "Password :", controller: _pass, isPass: false),
               SizedBox(
                 height: 20,
               ),
@@ -51,7 +45,10 @@ class _JoinMeetState extends State<JoinMeet> {
                 children: [
                   Expanded(
                       child: ElevatedButton(
-                          onPressed: createNewMeeting,
+                          onPressed: () {
+                            checkRoomAndCreateMeeting(_roomid.text.trim(),
+                                _pass.text.trim(), context, false);
+                          },
                           child: Text("Join Meet"))),
                 ],
               ),

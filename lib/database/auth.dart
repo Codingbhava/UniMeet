@@ -35,6 +35,6 @@ Future<void> GoogleData(User user) async {
       print("Google Data store error 'users' : $e");
     });
   } else {
-    UpdateUser(updateData, user.uid);
+    await UpdateUser(updateData, user.uid);
   }
 }

@@ -1,11 +1,11 @@
-import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:unimeet/constants/data.dart';
-import 'package:unimeet/context/meet.dart';
+
 import 'package:unimeet/database/read.dart';
+import 'package:unimeet/context/meet.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -16,14 +16,6 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final JitsiMeetMethods _jitsiMeetMethods = JitsiMeetMethods();
-
-  createNewMeeting() async {
-    var random = Random();
-    String roomName = (random.nextInt(10000000) + 10000000).toString();
-    _jitsiMeetMethods.createMeeting(roomName: roomName, isCreate: true);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -113,6 +105,62 @@ class _HomeState extends State<Home> {
                                       Icon(Icons.admin_panel_settings_outlined),
                                   label: Text("Admin"))),
                         ],
+                      );
+                    } else {
+                      return SizedBox();
+                    }
+                  }),
+              SizedBox(
+                height: 5,
+              ),
+              StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                  stream: currentUser(LogUser!.uid),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return Center(
+                        child: Text('Error: ${snapshot.error}'),
+                      );
+                    }
+
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(
+                        child: LinearProgressIndicator(),
+                      );
+                    }
+
+                    if (!snapshot.hasData || !snapshot.data!.exists) {
+                      return Center(
+                        child: Text('not admin'),
+                      );
+                    }
+
+                    // Print and display the updated data
+                    var userData = snapshot.data!.data()!;
+                    if (!userData["close"]) {
+                      return ElevatedButton.icon(
+                        icon: Icon(Icons.share),
+                        onPressed: () {},
+                        label: Row(
+                          children: [
+                            Expanded(
+                                child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Text("room : "),
+                                    Text(userData['room']),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Text('pass : '),
+                                    Text(userData['pass']),
+                                  ],
+                                )
+                              ],
+                            )),
+                          ],
+                        ),
                       );
                     } else {
                       return SizedBox();
@@ -255,62 +303,69 @@ class _HomeState extends State<Home> {
                       );
                     }
 
+                    // Sort the list of documents based on the 'createdAt' field in descending order
+                    List<dynamic> sortedDocs = (snapshot.data! as dynamic).docs;
+                    sortedDocs.sort(
+                        (a, b) => b['createdAt'].compareTo(a['createdAt']));
+
                     return ListView.builder(
-                        itemCount: (snapshot.data! as dynamic).docs.length,
-                        itemBuilder: (context, index) => Card(
-                              elevation: 13,
-                              margin: EdgeInsets.symmetric(vertical: 5),
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 20),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          'Room Id: ${(snapshot.data! as dynamic).docs[index]['meetingName']}',
+                      itemCount: sortedDocs.length,
+                      itemBuilder: (context, index) => Card(
+                        elevation: 13,
+                        margin: EdgeInsets.symmetric(vertical: 5),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Room Id: ${sortedDocs[index]['meetingName']}',
+                                  ),
+                                  if (sortedDocs[index]['isCreate'])
+                                    Chip(
+                                      backgroundColor: neonBlue,
+                                      label: Text(
+                                        "Created",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
                                         ),
-                                        if ((snapshot.data! as dynamic)
-                                            .docs[index]['isCreate'])
-                                          Chip(
-                                            backgroundColor: neonBlue,
-                                            label: Text(
-                                              "Created",
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          )
-                                        else
-                                          Chip(
-                                            backgroundColor:
-                                                const Color.fromARGB(
-                                                    255, 143, 107, 0),
-                                            label: Text("Joined",
-                                                style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontWeight:
-                                                        FontWeight.bold)),
-                                          ),
-                                      ],
+                                      ),
+                                    )
+                                  else
+                                    Chip(
+                                      backgroundColor: const Color.fromARGB(
+                                          255, 143, 107, 0),
+                                      label: Text(
+                                        "Joined",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                     ),
-                                    SizedBox(
-                                      height: 5,
-                                    ),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          'Joined on ${DateFormat.yMMMd().format((snapshot.data! as dynamic).docs[index]['createdAt'].toDate())}',
-                                        )
-                                      ],
-                                    ),
-                                  ],
-                                ),
+                                ],
                               ),
-                            ));
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    'Date: ${DateFormat.yMMMMEEEEd().add_jm().format(sortedDocs[index]['createdAt'].toDate())}',
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
                   },
                 ),
               )

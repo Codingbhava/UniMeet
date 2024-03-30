@@ -8,3 +8,11 @@ Future<void> UpdateUser(final data, String userId) async {
       .update(data)
       .onError((e, _) => print("Data update error 'users' : $e"));
 }
+
+Future<void> UpdateMeet(final data, String room) async {
+  await _db
+      .collection('CurrentMeet')
+      .doc(room)
+      .update(data)
+      .onError((e, _) => print("Data update error 'users' : $e"));
+}

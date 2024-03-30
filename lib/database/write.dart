@@ -13,3 +13,14 @@ void addToMeetingHistory(String meetingName, bool isCreate) async {
     print(e);
   }
 }
+
+void CreateMeeting(String room, String pass, bool isScheduled) async {
+  try {
+    await _db
+        .collection('CurrentMeet')
+        .doc(room)
+        .set({'room': room, 'pass': pass, 'isScheduled': isScheduled});
+  } catch (e) {
+    print(e);
+  }
+}

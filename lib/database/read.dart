@@ -35,3 +35,7 @@ Stream<QuerySnapshot<Map<String, dynamic>>> get meetingsHistory => _db
     .doc(LogUser?.uid)
     .collection('meetings')
     .snapshots();
+
+Future<DocumentSnapshot> ReadCurrentMeet(String room) async {
+  return await _db.collection('CurrentMeet').doc(room).get();
+}
