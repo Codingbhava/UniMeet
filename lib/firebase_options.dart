@@ -51,13 +51,13 @@ class DefaultFirebaseOptions {
         );
     }
   }
-
+// data found on firebase console
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyA9oUQ9mKEIgOzvpSzVCs5Rio5tVXDNVS4',
-    appId: '1:582591003691:android:994f35dce0d4aebdd8be6e',
-    messagingSenderId: '582591003691',
-    projectId: 'flutter-omkar',
-    databaseURL: 'https://flutter-omkar-default-rtdb.firebaseio.com',
-    storageBucket: 'flutter-omkar.appspot.com',
+    apiKey: 'add api key',
+    appId: 'add appid',
+    messagingSenderId: 'add msg tx id',
+    projectId: 'add project id',
+    databaseURL: 'add database url',
+    storageBucket: 'add storageBucket',
   );
 }
